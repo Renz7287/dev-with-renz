@@ -8,12 +8,14 @@ import {
   getContacts, upsertContact, deleteContact,
   uploadProjectImage, deleteProjectImage,
 } from '../lib/api'
+import { supabase } from '../lib/supabase'
 
 const PortfolioContext = createContext(null)
 
 export function PortfolioProvider({ children }) {
   const [data, setData] = useState({
     summary: '',
+    profilePhotoUrl: '',
     vaProjects: [],
     techProjects: [],
     vaSkills: [],
@@ -36,11 +38,12 @@ export function PortfolioProvider({ children }) {
     setLoading(true)
     try {
       const [
-        summary, vaProjects, techProjects,
+        summary, profilePhotoUrl, vaProjects, techProjects,
         vaSkills, techSkills, tools, strengths,
         availability, contacts,
       ] = await Promise.all([
         getSetting('summary'),
+        getSetting('profile_photo_url'),
         getVaProjects(),
         getTechProjects(),
         getSimpleList('va_skills'),
@@ -50,7 +53,13 @@ export function PortfolioProvider({ children }) {
         getAvailability(),
         getContacts(),
       ])
-      setData({ summary, vaProjects, techProjects, vaSkills, techSkills, tools, strengths, availability, contacts })
+      setData({
+        summary,
+        profilePhotoUrl: profilePhotoUrl ?? '',
+        vaProjects, techProjects,
+        vaSkills, techSkills, tools, strengths,
+        availability, contacts,
+      })
     } catch (err) {
       console.error('Failed to load portfolio data:', err)
     } finally {
@@ -65,6 +74,39 @@ export function PortfolioProvider({ children }) {
     await setSetting('summary', value)
     setData((p) => ({ ...p, summary: value }))
     showToast('Summary updated!')
+  }, [showToast])
+
+  // ── profile photo ──
+  const updateProfilePhoto = useCallback(async (imageFile) => {
+    if (!imageFile) return
+
+    // Always use a fixed filename so uploads replace the previous file
+    const ext = imageFile.name.split('.').pop()
+    const fileName = `profile-photo.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('profile-photos')
+      .upload(fileName, imageFile, { upsert: true })
+
+    if (uploadError) throw uploadError
+
+    // Add cache-busting timestamp so the browser refetches the new image
+    const { data: urlData } = supabase.storage
+      .from('profile-photos')
+      .getPublicUrl(fileName)
+
+    const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
+
+    await setSetting('profile_photo_url', publicUrl)
+    setData((p) => ({ ...p, profilePhotoUrl: publicUrl }))
+    showToast('Profile photo updated!')
+    return publicUrl
+  }, [showToast])
+
+  const removeProfilePhoto = useCallback(async () => {
+    await setSetting('profile_photo_url', '')
+    setData((p) => ({ ...p, profilePhotoUrl: '' }))
+    showToast('Profile photo removed!')
   }, [showToast])
 
   // ── VA projects ──
@@ -192,6 +234,7 @@ export function PortfolioProvider({ children }) {
       value={{
         data, loading, toast, showToast,
         updateSummary,
+        updateProfilePhoto, removeProfilePhoto,
         saveVaProject, removeVaProject,
         saveTechProject, removeTechProject,
         addToList, updateInList, removeFromList,

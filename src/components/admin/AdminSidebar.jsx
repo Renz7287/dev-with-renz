@@ -1,37 +1,47 @@
-import clsx from 'clsx'
+// src/components/admin/AdminSidebar.jsx
+// Replace your existing AdminSidebar.jsx with this file.
 
-const NAV_ITEMS = [
-  { key: 'summary',       label: 'Summary' },
-  { key: 'va-projects',   label: 'VA Projects' },
-  { key: 'tech-projects', label: 'Tech Projects' },
-  { key: 'va-skills',     label: 'VA Skills' },
-  { key: 'tech-skills',   label: 'Tech Skills' },
-  { key: 'tools',         label: 'Tools' },
-  { key: 'strengths',     label: 'Strengths' },
-  { key: 'availability',  label: 'Availability' },
-  { key: 'contacts',      label: 'Contacts' },
+const SECTIONS = [
+  { id: 'profile',       label: 'Profile Photo' },
+  { id: 'summary',       label: 'Summary' },
+  { id: 'va-projects',   label: 'VA Projects' },
+  { id: 'tech-projects', label: 'Tech Projects' },
+  { id: 'va-skills',     label: 'VA Skills' },
+  { id: 'tech-skills',   label: 'Tech Skills' },
+  { id: 'tools',         label: 'Tools' },
+  { id: 'strengths',     label: 'Strengths' },
+  { id: 'availability',  label: 'Availability' },
+  { id: 'contacts',      label: 'Contacts' },
 ]
 
 export default function AdminSidebar({ active, onChange, onLogout }) {
   return (
-    <aside className="w-44 shrink-0 border-r border-gold/10 py-4 flex flex-col">
-      <div className="flex-1">
-        {NAV_ITEMS.map((item) => (
+    <aside className="w-44 flex-shrink-0 border-r border-gold/10 flex flex-col py-4">
+      <nav className="flex-1 flex flex-col gap-0.5 px-2">
+        {SECTIONS.map((s) => (
           <button
-            key={item.key}
-            onClick={() => onChange(item.key)}
-            className={clsx('admin-nav-item', active === item.key && 'active')}
+            key={s.id}
+            onClick={() => onChange(s.id)}
+            className={`w-full text-left px-3 py-2 text-xs rounded-sm transition-colors cursor-pointer bg-transparent
+              ${active === s.id
+                ? 'bg-gold/10 text-gold border-l-2 border-gold'
+                : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-l-2 border-transparent'
+              }`}
           >
-            {item.label}
+            {s.label}
           </button>
         ))}
+      </nav>
+
+      <div className="px-2 pt-2 border-t border-gold/10 mt-2">
+        <button
+          onClick={onLogout}
+          className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300
+                     hover:bg-red-500/10 rounded-sm transition-colors cursor-pointer bg-transparent"
+        >
+          Sign Out
+        </button>
       </div>
-      <button
-        onClick={onLogout}
-        className="admin-nav-item mt-4 text-red-500/60 hover:text-red-400 hover:bg-red-500/5"
-      >
-        Logout
-      </button>
     </aside>
   )
 }
