@@ -1,5 +1,4 @@
-// src/components/admin/AdminSidebar.jsx
-// Replace your existing AdminSidebar.jsx with this file.
+import clsx from 'clsx'
 
 const SECTIONS = [
   { id: 'profile',       label: 'Profile Photo' },
@@ -16,28 +15,27 @@ const SECTIONS = [
 
 export default function AdminSidebar({ active, onChange, onLogout }) {
   return (
-    <aside className="w-44 flex-shrink-0 border-r border-gold/10 flex flex-col py-4">
-      <nav className="flex-1 flex flex-col gap-0.5 px-2">
-        {SECTIONS.map((s) => (
+    <aside className="w-44 flex-shrink-0 flex flex-col py-3"
+      style={{ borderRight: '1px solid var(--color-border)' }}>
+      <nav className="flex-1 flex flex-col">
+        {SECTIONS.map(({ id, label }) => (
           <button
-            key={s.id}
-            onClick={() => onChange(s.id)}
-            className={`w-full text-left px-3 py-2 text-xs rounded-sm transition-colors cursor-pointer bg-transparent
-              ${active === s.id
-                ? 'bg-gold/10 text-gold border-l-2 border-gold'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-l-2 border-transparent'
-              }`}
+            key={id}
+            onClick={() => onChange(id)}
+            className={clsx('admin-nav-item', { active: active === id })}
           >
-            {s.label}
+            {label}
           </button>
         ))}
       </nav>
-
-      <div className="px-2 pt-2 border-t border-gold/10 mt-2">
+      <div className="pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
         <button
           onClick={onLogout}
-          className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300
-                     hover:bg-red-500/10 rounded-sm transition-colors cursor-pointer bg-transparent"
+          className="w-full text-left px-5 py-2.5 text-xs tracking-[0.06em] uppercase
+                     bg-transparent border-0 cursor-pointer transition-all duration-200 min-h-[44px]"
+          style={{ color: 'rgba(239,68,68,0.6)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.backgroundColor = 'transparent' }}
         >
           Sign Out
         </button>

@@ -15,7 +15,9 @@ export default function SummaryAdmin() {
 
   return (
     <div>
-      <h3 className="font-head text-lg mb-5">Edit Summary</h3>
+      <h3 className="font-head text-lg mb-5" style={{ color: 'var(--color-heading)' }}>
+        Edit Summary
+      </h3>
       <FormField id="summary" label="About Text" value={value} onChange={setValue} rows={6} />
       <button className="btn-gold flex items-center gap-2" onClick={handleSave} disabled={saving}>
         {saving && <Spinner />}

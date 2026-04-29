@@ -12,6 +12,17 @@ import { supabase } from '../lib/supabase'
 
 const PortfolioContext = createContext(null)
 
+// getSetting uses .single() which throws on missing row — use this safe version instead
+async function getSettingSafe(key) {
+  const { data, error } = await supabase
+    .from('portfolio_settings')
+    .select('value')
+    .eq('key', key)
+    .maybeSingle()
+  if (error) throw error
+  return data?.value ?? ''
+}
+
 export function PortfolioProvider({ children }) {
   const [data, setData] = useState({
     summary: '',
@@ -38,12 +49,13 @@ export function PortfolioProvider({ children }) {
     setLoading(true)
     try {
       const [
-        summary, profilePhotoUrl, vaProjects, techProjects,
+        summary, profilePhotoUrl,
+        vaProjects, techProjects,
         vaSkills, techSkills, tools, strengths,
         availability, contacts,
       ] = await Promise.all([
-        getSetting('summary'),
-        getSetting('profile_photo_url'),
+        getSettingSafe('summary'),
+        getSettingSafe('profile_photo_url'),
         getVaProjects(),
         getTechProjects(),
         getSimpleList('va_skills'),
@@ -80,21 +92,19 @@ export function PortfolioProvider({ children }) {
   const updateProfilePhoto = useCallback(async (imageFile) => {
     if (!imageFile) return
 
-    // Always use a fixed filename so uploads replace the previous file
     const ext = imageFile.name.split('.').pop()
     const fileName = `profile-photo.${ext}`
 
     const { error: uploadError } = await supabase.storage
       .from('profile-photos')
       .upload(fileName, imageFile, { upsert: true })
-
     if (uploadError) throw uploadError
 
-    // Add cache-busting timestamp so the browser refetches the new image
     const { data: urlData } = supabase.storage
       .from('profile-photos')
       .getPublicUrl(fileName)
 
+    // Cache-bust so the browser refetches the new image
     const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
     await setSetting('profile_photo_url', publicUrl)

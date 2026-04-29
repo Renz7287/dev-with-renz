@@ -5,7 +5,7 @@ import { VaProjectCard, TechProjectCard } from './ProjectCard'
 
 const PROJECT_TABS = [
   { label: 'Virtual Assistant', value: 'va' },
-  { label: 'Tech & Dev', value: 'tech' },
+  { label: 'Tech & Dev',        value: 'tech' },
 ]
 
 export default function Projects() {
@@ -15,7 +15,8 @@ export default function Projects() {
   const projects = activeTab === 'va' ? data.vaProjects : data.techProjects
 
   return (
-    <section id="projects" className="max-w-4xl mx-auto px-6 md:px-10 py-20 border-t border-gold/10">
+    <section id="projects" className="max-w-4xl mx-auto px-6 md:px-10 py-20"
+      style={{ borderTop: '1px solid var(--color-border)' }}>
       <SectionHeader label="Work" title="Projects" />
       <Tabs tabs={PROJECT_TABS} active={activeTab} onChange={setActiveTab} />
 

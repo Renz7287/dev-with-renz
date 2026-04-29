@@ -1,75 +1,63 @@
-// src/components/sections/Hero.jsx
-// Replace your existing Hero.jsx with this file.
-// It reads `profile_photo_url` from PortfolioContext and renders it.
+import { usePortfolio } from '../../context/PortfolioContext'
 
-import { usePortfolio } from "../../context/PortfolioContext";
+function ProfileAvatar({ src }) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt="Clarence G. Cabrera"
+        loading="eager"
+        className="w-36 h-36 md:w-52 md:h-52 rounded-full object-cover"
+        style={{ border: '1px solid var(--color-border)', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+      />
+    )
+  }
+  return (
+    <div
+      className="w-36 h-36 md:w-52 md:h-52 rounded-full flex items-center justify-center"
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        border: '1px dashed var(--color-border)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.10)',
+      }}
+    >
+      <span className="font-head text-5xl md:text-6xl select-none" style={{ color: 'var(--color-accent)', opacity: 0.4 }}>
+        C
+      </span>
+    </div>
+  )
+}
 
 export default function Hero() {
-  const { summary, profilePhotoUrl } = usePortfolio();
+  const { data } = usePortfolio()
+  const { summary, profilePhotoUrl } = data
 
   return (
-    <section
-      id="hero"
-      className="min-h-screen flex items-center justify-center px-6 py-24"
-    >
-      <div className="max-w-4xl w-full flex flex-col md:flex-row items-center gap-10 md:gap-16">
+    <section id="hero" className="min-h-screen flex items-center justify-center px-6 py-24">
+      <div className="max-w-4xl w-full flex flex-col md:flex-row items-center gap-10 md:gap-16 animate-fade-in">
 
-        {/* ── Profile Photo ─────────────────────────────────── */}
         <div className="flex-shrink-0">
-          {profilePhotoUrl ? (
-            <img
-              src={profilePhotoUrl}
-              alt="Clarence G. Cabrera"
-              className="w-40 h-40 md:w-52 md:h-52 rounded-full object-cover
-                         border-4 border-indigo-500 shadow-xl shadow-indigo-500/20"
-            />
-          ) : (
-            /* Placeholder avatar when no photo is set */
-            <div
-              className="w-40 h-40 md:w-52 md:h-52 rounded-full
-                          bg-gradient-to-br from-indigo-600 to-purple-600
-                          flex items-center justify-center
-                          border-4 border-indigo-500 shadow-xl shadow-indigo-500/20"
-            >
-              <span className="text-5xl md:text-6xl font-bold text-white select-none">
-                C
-              </span>
-            </div>
-          )}
+          <ProfileAvatar src={profilePhotoUrl} />
         </div>
 
-        {/* ── Text Content ──────────────────────────────────── */}
-        <div className="text-center md:text-left space-y-4">
-          <p className="text-indigo-400 font-medium tracking-widest uppercase text-sm">
-            Hello, I'm
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+        <div className="text-center md:text-left space-y-4 max-w-xl">
+          <p className="section-label">Hello, I'm</p>
+
+          <h1 className="heading-primary text-4xl md:text-5xl">
             Clarence G. Cabrera
           </h1>
-          <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-xl">
-            {summary ||
-              "Motivated and detail-oriented college student taking up Information Technology, seeking a Virtual Assistant position."}
+
+          <p className="body-text text-sm md:text-base text-justify">
+            {summary || 'Motivated and detail-oriented college student taking up Information Technology, seeking a Virtual Assistant position.'}
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-2">
-            <a
-              href="#projects"
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg
-                         font-medium transition-colors shadow-lg shadow-indigo-500/25"
-            >
-              View My Work
-            </a>
-            <a
-              href="#contact"
-              className="px-6 py-3 border border-indigo-500 text-indigo-400 hover:bg-indigo-500/10
-                         rounded-lg font-medium transition-colors"
-            >
-              Contact Me
-            </a>
+            <a href="#projects" className="btn-gold">View My Work</a>
+            <a href="#contact"  className="btn-ghost">Contact Me</a>
           </div>
         </div>
+
       </div>
     </section>
-  );
+  )
 }

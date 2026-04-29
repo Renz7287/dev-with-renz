@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { usePortfolio } from '../../context/PortfolioContext'
 import { EmptyState, Spinner } from '../ui'
 
-// fieldMap maps section key → { field, category, title }
 export const SIMPLE_LIST_CONFIG = {
   'va-skills':   { field: 'vaSkills',   category: 'va_skills',   title: 'VA Skills' },
   'tech-skills': { field: 'techSkills', category: 'tech_skills', title: 'Tech Skills' },
@@ -21,15 +20,14 @@ export default function SimpleListAdmin({ sectionKey }) {
   const [adding, setAdding]   = useState(false)
   const [saving, setSaving]   = useState(false)
 
-  const startEdit = (item) => { setEditId(item.id); setEditVal(item.value); setAdding(false) }
+  const startEdit  = (item) => { setEditId(item.id); setEditVal(item.value); setAdding(false) }
   const cancelEdit = () => { setEditId(null); setEditVal('') }
 
   const handleUpdate = async () => {
     if (!editVal.trim()) return
     setSaving(true)
     await updateInList(config.field, editId, editVal.trim())
-    setSaving(false)
-    cancelEdit()
+    setSaving(false); cancelEdit()
   }
 
   const handleDelete = async (id) => {
@@ -42,19 +40,26 @@ export default function SimpleListAdmin({ sectionKey }) {
     if (!newVal.trim()) return
     setSaving(true)
     await addToList(config.field, config.category, newVal.trim())
-    setSaving(false)
-    setNewVal('')
-    setAdding(false)
+    setSaving(false); setNewVal(''); setAdding(false)
+  }
+
+  const inputStyle = {
+    backgroundColor: 'var(--color-bg)',
+    border: '1px solid var(--color-border)',
+    color: 'var(--color-heading)',
+    borderRadius: '2px',
+    padding: '0.5rem 0.75rem',
+    fontSize: '0.875rem',
+    outline: 'none',
+    width: '100%',
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <h3 className="font-head text-lg">{config.title}</h3>
+        <h3 className="font-head text-lg" style={{ color: 'var(--color-heading)' }}>{config.title}</h3>
         <button className="btn-ghost text-xs px-3 py-1.5"
-          onClick={() => { setAdding(true); cancelEdit() }}>
-          + Add
-        </button>
+          onClick={() => { setAdding(true); cancelEdit() }}>+ Add</button>
       </div>
 
       {items.length === 0 && !adding ? (
@@ -65,13 +70,12 @@ export default function SimpleListAdmin({ sectionKey }) {
           {items.map((item) =>
             editId === item.id ? (
               <div key={item.id} className="flex gap-2 items-center">
-                <input
-                  className="flex-1 bg-dark-700 border border-gold/30 text-neutral-100 px-3 py-2 text-sm rounded-sm outline-none focus:border-gold/60"
-                  value={editVal}
+                <input style={inputStyle} value={editVal}
                   onChange={(e) => setEditVal(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                  autoFocus
-                />
+                  onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+                  onBlur={e =>  { e.currentTarget.style.borderColor = 'var(--color-border)' }}
+                  autoFocus />
                 <button className="btn-gold px-3 py-2 text-xs flex items-center gap-1"
                   onClick={handleUpdate} disabled={saving}>
                   {saving && <Spinner />} Save
@@ -82,14 +86,19 @@ export default function SimpleListAdmin({ sectionKey }) {
               </div>
             ) : (
               <div key={item.id}
-                className="flex items-center justify-between px-4 py-2.5 rounded-sm border border-gold/10 bg-dark-700 hover:border-gold/30 transition-all duration-200">
-                <span className="text-sm text-neutral-300">{item.value}</span>
+                className="flex items-center justify-between px-4 py-2.5 rounded-sm transition-all duration-200"
+                style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)' }}
+              >
+                <span className="text-sm" style={{ color: 'var(--color-body)' }}>{item.value}</span>
                 <button
-                  className="text-xs text-neutral-600 hover:text-gold transition-colors bg-transparent border-0 cursor-pointer"
+                  className="text-xs bg-transparent border-0 cursor-pointer transition-colors"
+                  style={{ color: 'var(--color-muted)' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-muted)' }}
                   onClick={() => startEdit(item)}
-                >
-                  Edit
-                </button>
+                >Edit</button>
               </div>
             )
           )}
@@ -97,15 +106,14 @@ export default function SimpleListAdmin({ sectionKey }) {
       )}
 
       {adding && (
-        <div className="flex gap-2 items-center border border-gold/15 rounded-sm p-3 bg-dark-800">
-          <input
-            className="flex-1 bg-dark-700 border border-gold/20 text-neutral-100 px-3 py-2 text-sm rounded-sm outline-none focus:border-gold/50"
-            value={newVal}
+        <div className="flex gap-2 items-center rounded-sm p-3"
+          style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+          <input style={{ ...inputStyle, flex: 1 }} value={newVal}
             onChange={(e) => setNewVal(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            placeholder="Enter value…"
-            autoFocus
-          />
+            onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+            onBlur={e =>  { e.currentTarget.style.borderColor = 'var(--color-border)' }}
+            placeholder="Enter value…" autoFocus />
           <button className="btn-gold px-3 py-2 text-xs flex items-center gap-1"
             onClick={handleAdd} disabled={saving}>
             {saving && <Spinner />} Add

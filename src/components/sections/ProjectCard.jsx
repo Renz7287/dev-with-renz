@@ -19,8 +19,12 @@ export function VaProjectCard({ title, description, image_url }) {
           </button>
         )}
         <div>
-          <h3 className="font-head text-xl mb-2">{title}</h3>
-          <p className="text-neutral-500 text-sm leading-relaxed">{description}</p>
+          <h3 className="font-head text-xl mb-2" style={{ color: 'var(--color-heading)' }}>
+            {title}
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+            {description}
+          </p>
         </div>
       </div>
 
@@ -53,8 +57,12 @@ export function TechProjectCard({ name, description, icon_url }) {
         <img src={icon_url} alt={name} className="w-10 h-10 object-contain rounded" />
       )}
       <div>
-        <h3 className="font-head text-xl mb-2">{name}</h3>
-        <p className="text-neutral-500 text-sm leading-relaxed">{description}</p>
+        <h3 className="font-head text-xl mb-2" style={{ color: 'var(--color-heading)' }}>
+          {name}
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+          {description}
+        </p>
       </div>
     </div>
   )
