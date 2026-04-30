@@ -2,49 +2,232 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Two fully independent design systems:
+ *   Dark  — gold accent on near-black surfaces (default)
+ *   Light — navy/slate accent on cool white surfaces
+ *
+ * Rule: Adaptive Dark Themes — dark mode is NOT an inverted filter.
+ * Each mode defines its own background, surface, text, and accent tokens.
+ */
+
+/* ── CSS design tokens ──────────────────────────────────── */
+:root {
+  /* Dark mode tokens (default) */
+  --color-bg:       #0d0d0d;
+  --color-surface:  #151515;
+  --color-border:   rgba(200, 169, 110, 0.12);
+  --color-accent:   #c8a96e;
+  --color-accent-h: #e8c98a;
+  --color-heading:  #e5e5e5;
+  --color-body:     #a3a3a3;
+  --color-muted:    #525252;
+  --navbar-bg:      rgba(13, 13, 13, 0.90);
+  --navbar-border:  rgba(200, 169, 110, 0.10);
+  --scrollbar-bg:   #0d0d0d;
+}
+
+html:not(.dark) {
+  /* Light mode tokens — slate/navy accent on crisp white surfaces */
+  --color-bg:       #f8f9fb;
+  --color-surface:  #ffffff;
+  --color-border:   rgba(45, 74, 110, 0.12);
+  --color-accent:   #2d4a6e;
+  --color-accent-h: #3d6494;
+  --color-heading:  #111827;
+  --color-body:     #374151;
+  --color-muted:    #9ca3af;
+  --navbar-bg:      rgba(248, 249, 251, 0.92);
+  --navbar-border:  rgba(45, 74, 110, 0.10);
+  --scrollbar-bg:   #f8f9fb;
+}
+
 @layer base {
   html { scroll-behavior: smooth; }
-  body { @apply bg-dark-900 text-neutral-100 font-body antialiased; }
-  ::selection { @apply bg-gold/30 text-gold; }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { @apply bg-dark-900; }
-  ::-webkit-scrollbar-thumb { @apply bg-gold/30 rounded-full; }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-body);
+    @apply font-body antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: rgba(45, 74, 110, 0.20);
+    color: var(--color-accent);
+  }
+  .dark ::selection {
+    background-color: rgba(200, 169, 110, 0.25);
+    color: #c8a96e;
+  }
+
+  ::-webkit-scrollbar       { width: 4px; }
+  ::-webkit-scrollbar-track { background-color: var(--scrollbar-bg); }
+  ::-webkit-scrollbar-thumb { background-color: rgba(128,128,128,0.3); border-radius: 9999px; }
 }
 
 @layer components {
+
+  /* ── Buttons ────────────────────────────────────────────── */
+
+  /*
+   * .btn-primary — one per screen.
+   * Dark:  gold fill.  Light: navy fill.
+   */
   .btn-gold {
-    @apply bg-gold text-black font-medium text-sm px-5 py-2.5 rounded-sm
-           hover:bg-gold-light transition-colors duration-200 cursor-pointer border-0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    background-color: var(--color-accent);
+    color: #ffffff;
   }
+  .btn-gold:hover  { background-color: var(--color-accent-h); }
+  .btn-gold:active { transform: scale(0.97); }
+  /* Dark mode: gold on black needs dark text for contrast */
+  .dark .btn-gold  { color: #000000; }
+
+  /* .btn-ghost — secondary action */
   .btn-ghost {
-    @apply bg-transparent border border-gold/20 text-neutral-400 text-sm px-4 py-2.5 rounded-sm
-           hover:border-gold/50 hover:text-neutral-200 transition-all duration-200 cursor-pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
   }
+  .btn-ghost:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background-color: rgba(45, 74, 110, 0.05);
+  }
+  .dark .btn-ghost:hover { background-color: rgba(200, 169, 110, 0.06); }
+
+  /* .btn-danger — destructive actions */
   .btn-danger {
-    @apply bg-transparent border border-red-500/30 text-red-400 text-sm px-4 py-2 rounded-sm
-           hover:bg-red-500/10 transition-all duration-200 cursor-pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    color: #f87171;
   }
+  .btn-danger:hover { background-color: rgba(239, 68, 68, 0.08); }
+
+  /* ── Cards ──────────────────────────────────────────────── */
+
+  /*
+   * Elevation via lighter surface in dark, crisp white + subtle shadow in light.
+   * Rule: Adaptive Dark Themes #2.
+   */
   .card-base {
-    @apply bg-dark-800 border border-gold/10 rounded-sm transition-all duration-300;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 2px;
+    transition: all 0.3s ease;
   }
-  .card-hover {
-    @apply hover:border-gold/40 hover:-translate-y-1;
+  html:not(.dark) .card-base {
+    box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
   }
+
+  .card-hover:hover {
+    border-color: var(--color-accent);
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  /* ── Navbar ─────────────────────────────────────────────── */
+  .navbar-glass {
+    background-color: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* ── Typography helpers ─────────────────────────────────── */
+  .section-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    opacity: 0.75;
+  }
+
+  .heading-primary {
+    font-family: 'Playfair Display', serif;
+    color: var(--color-heading);
+    line-height: 1.2;
+  }
+
+  .body-text {
+    color: var(--color-body);
+    line-height: 1.7;
+  }
+
+  /* ── Admin nav ──────────────────────────────────────────── */
   .admin-nav-item {
-    @apply w-full text-left px-5 py-2.5 text-xs tracking-[0.06em] uppercase text-neutral-500
-           bg-transparent border-0 cursor-pointer transition-all duration-200
-           hover:text-neutral-200 hover:bg-dark-700;
+    @apply w-full text-left px-5 py-2.5 text-xs tracking-[0.06em] uppercase
+           bg-transparent border-0 cursor-pointer transition-all duration-200 min-h-[44px];
+    color: var(--color-muted);
+  }
+  .admin-nav-item:hover {
+    color: var(--color-heading);
+    background-color: rgba(128, 128, 128, 0.06);
   }
   .admin-nav-item.active {
-    @apply text-gold bg-gold/5 border-l-2 border-gold;
+    color: var(--color-accent);
+    background-color: rgba(45, 74, 110, 0.08);
+    border-left: 2px solid var(--color-accent);
+  }
+  .dark .admin-nav-item.active {
+    background-color: rgba(200, 169, 110, 0.06);
   }
 }
 
-/* Project card accent bar */
+/* ── Project card accent bar on hover ───────────────────── */
 .project-card { position: relative; overflow: hidden; }
 .project-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: #c8a96e; transform: scaleX(0); transform-origin: left;
+  background-color: var(--color-accent);
+  transform: scaleX(0); transform-origin: left;
   transition: transform 0.35s ease;
 }
 .project-card:hover::before { transform: scaleX(1); }
+
+/* ── Navbar-specific tokens ─────────────────────────────────
+ * Separate from page tokens so the navbar can be more visible
+ * than the general surface colors. Dark: bright off-white links
+ * on near-black. Light: dark slate links on ivory.
+ * ----------------------------------------------------------*/
+:root {
+  --nav-bg:     rgba(13, 13, 13, 0.95);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --nav-link:   #d4d4d4;   /* neutral-300 — clearly visible on dark */
+  --nav-accent: #c8a96e;   /* gold */
+}
+html:not(.dark) {
+  --nav-bg:     rgba(248, 249, 251, 0.97);
+  --nav-border: rgba(45, 74, 110, 0.15);
+  --nav-link:   #374151;   /* slate-700 — clearly visible on light */
+  --nav-accent: #2d4a6e;   /* navy */
+}

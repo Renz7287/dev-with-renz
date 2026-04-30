@@ -1,28 +1,62 @@
 import { usePortfolio } from '../../context/PortfolioContext'
-import { GoldLine, Skeleton } from '../ui'
+
+function ProfileAvatar({ src }) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt="Clarence G. Cabrera"
+        loading="eager"
+        className="w-36 h-36 md:w-52 md:h-52 rounded-full object-cover"
+        style={{ border: '1px solid var(--color-border)', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+      />
+    )
+  }
+  return (
+    <div
+      className="w-36 h-36 md:w-52 md:h-52 rounded-full flex items-center justify-center"
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        border: '1px dashed var(--color-border)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.10)',
+      }}
+    >
+      <span className="font-head text-5xl md:text-6xl select-none" style={{ color: 'var(--color-accent)', opacity: 0.4 }}>
+        C
+      </span>
+    </div>
+  )
+}
 
 export default function Hero() {
-  const { data, loading } = usePortfolio()
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const { data } = usePortfolio()
+  const { summary, profilePhotoUrl } = data
 
   return (
-    <section className="min-h-screen flex items-center px-6 md:px-10 pt-24 pb-16 max-w-4xl mx-auto">
-      <div className="flex flex-col gap-6 animate-fade-in">
-        <p className="text-xs tracking-[0.22em] uppercase text-gold">Virtual Assistant &amp; IT Student</p>
-        <h1 className="font-head text-5xl md:text-7xl leading-[1.05]">
-          Clarence G.<br />
-          <span className="text-gold">Cabrera.</span>
-        </h1>
-        <GoldLine />
-        {loading ? (
-          <Skeleton className="h-16 w-full max-w-lg" />
-        ) : (
-          <p className="text-neutral-400 text-base md:text-lg leading-relaxed max-w-lg">{data.summary}</p>
-        )}
-        <div className="flex gap-3 flex-wrap mt-2">
-          <button className="btn-gold" onClick={() => scrollTo('contact')}>Get in Touch</button>
-          <button className="btn-ghost" onClick={() => scrollTo('projects')}>View Projects</button>
+    <section id="hero" className="min-h-screen flex items-center justify-center px-6 py-24">
+      <div className="max-w-4xl w-full flex flex-col md:flex-row items-center gap-10 md:gap-16 animate-fade-in">
+
+        <div className="flex-shrink-0">
+          <ProfileAvatar src={profilePhotoUrl} />
         </div>
+
+        <div className="text-center md:text-left space-y-4 max-w-xl">
+          <p className="section-label">Hello, I'm</p>
+
+          <h1 className="heading-primary text-4xl md:text-5xl">
+            Clarence G. Cabrera
+          </h1>
+
+          <p className="body-text text-sm md:text-base text-justify">
+            {summary || 'Motivated and detail-oriented college student taking up Information Technology, seeking a Virtual Assistant position.'}
+          </p>
+
+          <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-2">
+            <a href="#projects" className="btn-gold">View My Work</a>
+            <a href="#contact"  className="btn-ghost">Contact Me</a>
+          </div>
+        </div>
+
       </div>
     </section>
   )

@@ -1,0 +1,50 @@
+/* AdminBtn.module.css */
+/* Scoped CSS Module per Rule: Styling Constraints #4 */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;           /* touch target per Rule: Mobile-First #2 */
+  padding: 0 1.25rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  color: var(--color-muted);
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background-color: rgba(45, 74, 110, 0.05);  /* subtle navy tint in light */
+}
+
+/* In dark mode the hover tint should use gold alpha */
+:global(.dark) .btn:hover {
+  background-color: rgba(200, 169, 110, 0.06);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Icon slot — sized to match text baseline */
+.icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}

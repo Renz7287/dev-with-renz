@@ -1,26 +1,119 @@
+// src/components/layout/Navbar.jsx
+import { useState, useEffect } from 'react'
+import clsx from 'clsx'
 import { useAuth } from '../../context/AuthContext'
+import DarkModeToggle from '../ui/DarkModeToggle'
+import AdminBtn from '../ui/AdminBtn'
+import styles from './Navbar.module.css'
+
+const NAV_LINKS = ['about', 'projects', 'skills', 'contact']
+
+// Tracks which section is in the viewport via IntersectionObserver
+function useActiveSection() {
+  const [active, setActive] = useState('')
+  useEffect(() => {
+    const observers = NAV_LINKS.map((id) => {
+      const el = document.getElementById(id)
+      if (!el) return null
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(id) },
+        { rootMargin: '-40% 0px -55% 0px' }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach((o) => o?.disconnect())
+  }, [])
+  return active
+}
+
+function MobileDrawer({ onClose, onAdminClick, isAuthenticated, activeSection }) {
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    onClose()
+  }
+  return (
+    <>
+      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.drawer}>
+        <div className={styles.drawerHeader}>
+          <button className={styles.drawerClose} onClick={onClose} aria-label="Close menu">✕</button>
+        </div>
+        <nav className={styles.drawerNav}>
+          {NAV_LINKS.map((id) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className={clsx(styles.drawerLink, { [styles.drawerLinkActive]: activeSection === id })}
+            >
+              {id}
+            </button>
+          ))}
+        </nav>
+        <div className={styles.drawerFooter}>
+          <DarkModeToggle />
+          <AdminBtn onClick={() => { onClose(); onAdminClick() }} isAuthenticated={isAuthenticated} />
+        </div>
+      </div>
+    </>
+  )
+}
 
 export default function Navbar({ onAdminClick }) {
   const { isAuthenticated } = useAuth()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const activeSection = useActiveSection()
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-10 py-4 bg-dark-900/90 backdrop-blur-md border-b border-gold/10">
-      <span className="font-head text-gold tracking-widest text-base">CGC</span>
-      <div className="flex items-center gap-6 md:gap-8">
-        {['about', 'projects', 'skills', 'contact'].map((id) => (
+    <>
+      <nav className="navbar-glass fixed top-0 left-0 right-0 z-50
+                      flex justify-between items-center px-6 md:px-10 py-4">
+
+        {/* Desktop nav links */}
+        <div className={styles.desktopNav}>
+          {NAV_LINKS.map((id) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className={clsx(styles.navLink, { [styles.navLinkActive]: activeSection === id })}
+            >
+              {id}
+            </button>
+          ))}
+        </div>
+
+        {/* Right side */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {/* Desktop: toggle + admin */}
+          <div className={styles.desktopControls}>
+            <DarkModeToggle />
+            <AdminBtn onClick={onAdminClick} isAuthenticated={isAuthenticated} />
+          </div>
+          {/* Mobile: hamburger — hidden at md via CSS Module media query */}
           <button
-            key={id}
-            onClick={() => scrollTo(id)}
-            className="text-neutral-500 text-xs tracking-[0.1em] uppercase hover:text-gold transition-colors duration-200 bg-transparent border-0 cursor-pointer capitalize hidden md:block"
+            className={styles.hamburger}
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={drawerOpen}
           >
-            {id}
+            <div className={styles.hamburgerLines}>
+              <span className={styles.line} />
+              <span className={styles.line} />
+              <span className={styles.line} />
+            </div>
           </button>
-        ))}
-        <button onClick={onAdminClick} className="btn-ghost text-xs tracking-[0.1em] uppercase px-4 py-2">
-          {isAuthenticated ? '⚙ Admin' : 'Admin'}
-        </button>
-      </div>
-    </nav>
+        </div>
+      </nav>
+
+      {drawerOpen && (
+        <MobileDrawer
+          onClose={() => setDrawerOpen(false)}
+          onAdminClick={onAdminClick}
+          isAuthenticated={isAuthenticated}
+          activeSection={activeSection}
+        />
+      )}
+    </>
   )
 }

@@ -1,11 +1,15 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+// src/context/AuthContext.jsx
+// onAuthStateChange handles auto-logout — when Supabase session expires,
+// it fires with session=null which sets isAuthenticated to false,
+// and the onExpire callback closes the AdminPanel automatically.
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { signIn as apiSignIn, signOut as apiSignOut } from '../lib/api'
 
 const AuthContext = createContext(null)
 
-export function AuthProvider({ children }) {
-  const [session, setSession] = useState(undefined) // undefined = loading
+export function AuthProvider({ children, onExpire }) {
+  const [session, setSession]     = useState(undefined)
   const [authError, setAuthError] = useState('')
 
   useEffect(() => {
@@ -13,11 +17,15 @@ export function AuthProvider({ children }) {
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s)
+      // Session went from authenticated → null = expiry or remote sign-out
+      // Notify parent (App.jsx) to close the admin panel
+      if (!s) onExpire?.()
     })
-    return () => listener.subscription.unsubscribe()
-  }, [])
 
-  const login = async (email, password) => {
+    return () => listener.subscription.unsubscribe()
+  }, [onExpire])
+
+  const login = useCallback(async (email, password) => {
     setAuthError('')
     try {
       await apiSignIn(email, password)
@@ -26,23 +34,21 @@ export function AuthProvider({ children }) {
       setAuthError(err.message ?? 'Login failed.')
       return false
     }
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await apiSignOut()
-  }
+  }, [])
 
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        isAuthenticated: !!session,
-        isLoading: session === undefined,
-        authError,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{
+      session,
+      isAuthenticated: !!session,
+      isLoading: session === undefined,
+      authError,
+      login,
+      logout,
+    }}>
       {children}
     </AuthContext.Provider>
   )

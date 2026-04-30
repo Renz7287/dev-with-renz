@@ -18,12 +18,18 @@ export default function AdminLogin({ onSuccess }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-14 px-8 gap-5 w-full">
-      <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center">
-        <span className="text-gold text-xl font-head">A</span>
+      <div className="w-12 h-12 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: 'rgba(var(--color-accent-rgb, 45,74,110), 0.1)', border: '1px solid var(--color-border)' }}>
+        <span className="font-head text-xl" style={{ color: 'var(--color-accent)' }}>A</span>
       </div>
+
       <div className="text-center">
-        <h3 className="font-head text-gold text-xl mb-1">Admin Access</h3>
-        <p className="text-neutral-500 text-xs">Sign in with your Supabase account</p>
+        <h3 className="font-head text-xl mb-1" style={{ color: 'var(--color-heading)' }}>
+          Admin Access
+        </h3>
+        <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+          Sign in with your Supabase account
+        </p>
       </div>
 
       <div className="w-full max-w-xs flex flex-col gap-1">
@@ -37,11 +43,7 @@ export default function AdminLogin({ onSuccess }) {
         <p className="text-red-400 text-xs text-center max-w-xs">{authError}</p>
       )}
 
-      <button
-        className="btn-gold px-10 flex items-center gap-2"
-        onClick={handleSubmit}
-        disabled={loading}
-      >
+      <button className="btn-gold px-10 flex items-center gap-2" onClick={handleSubmit} disabled={loading}>
         {loading && <Spinner />}
         {loading ? 'Signing in…' : 'Sign In'}
       </button>

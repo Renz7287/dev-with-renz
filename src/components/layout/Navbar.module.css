@@ -1,0 +1,198 @@
+/* Navbar.module.css */
+
+/* ── Active link indicator ───────────────────── */
+.navLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--nav-link);
+  transition: color 0.2s ease;
+}
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background-color: var(--nav-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+  border-radius: 2px;
+}
+.navLink:hover { color: var(--nav-accent); }
+.navLink:hover::after { transform: scaleX(1); }
+
+.navLinkActive {
+  color: var(--nav-accent) !important;
+}
+.navLinkActive::after {
+  transform: scaleX(1);
+}
+
+/* ── Hamburger button — mobile only ─────────── */
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid var(--nav-border);
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--nav-link);
+  transition: color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+.hamburger:hover {
+  color: var(--nav-accent);
+  border-color: var(--nav-accent);
+}
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+}
+
+.hamburgerLines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 16px;
+}
+.line {
+  height: 1.5px;
+  width: 100%;
+  background-color: currentColor;
+  border-radius: 2px;
+}
+
+/* ── Desktop controls — hidden on mobile ─────── */
+.desktopControls {
+  display: none;
+}
+@media (min-width: 768px) {
+  .desktopControls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+/* ── Desktop nav — hidden on mobile ─────────── */
+.desktopNav {
+  display: none;
+}
+@media (min-width: 768px) {
+  .desktopNav {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+}
+
+/* ── Mobile drawer overlay ───────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Mobile drawer ───────────────────────────── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 260px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.5rem 2rem;
+  background-color: var(--color-bg);
+  border-left: 1px solid var(--color-border);
+  animation: slideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.drawerClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.drawerClose:hover {
+  color: var(--color-heading);
+  border-color: var(--color-accent);
+}
+
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+.drawerLink {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.drawerLink:hover {
+  color: var(--color-accent);
+  background-color: rgba(128,128,128,0.06);
+}
+.drawerLinkActive {
+  color: var(--color-accent);
+  background-color: rgba(128,128,128,0.06);
+}
+
+.drawerFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}

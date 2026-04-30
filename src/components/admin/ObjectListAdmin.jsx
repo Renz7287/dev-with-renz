@@ -1,12 +1,6 @@
 import { useState } from 'react'
-import clsx from 'clsx'
 import { FormField, EmptyState, Spinner } from '../ui'
 
-/**
- * fields: [{ key, label, rows?, placeholder? }]
- * onSave(formObj) → Promise
- * onDelete(id)    → Promise
- */
 export default function ObjectListAdmin({ title, items, fields, onSave, onDelete }) {
   const [selected, setSelected] = useState(null)
   const [form, setForm]         = useState({})
@@ -21,31 +15,22 @@ export default function ObjectListAdmin({ title, items, fields, onSave, onDelete
     const payload = {}
     fields.forEach(({ key }) => { payload[key] = (form[key] ?? '').trim() })
     if (!payload[fields[0].key]) return
-
     setSaving(true)
-    try {
-      await onSave(selected === 'new' ? payload : { ...payload, id: selected })
-      cancel()
-    } finally {
-      setSaving(false)
-    }
+    try { await onSave(selected === 'new' ? payload : { ...payload, id: selected }); cancel() }
+    finally { setSaving(false) }
   }
 
   const handleDelete = async () => {
     if (!window.confirm('Delete this item?')) return
     setDeleting(true)
-    try {
-      await onDelete(selected)
-      cancel()
-    } finally {
-      setDeleting(false)
-    }
+    try { await onDelete(selected); cancel() }
+    finally { setDeleting(false) }
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <h3 className="font-head text-lg">{title}</h3>
+        <h3 className="font-head text-lg" style={{ color: 'var(--color-heading)' }}>{title}</h3>
         <button className="btn-ghost text-xs px-3 py-1.5" onClick={openNew}>+ Add</button>
       </div>
 
@@ -53,33 +38,42 @@ export default function ObjectListAdmin({ title, items, fields, onSave, onDelete
         <EmptyState message={`No ${title.toLowerCase()} yet.`} cta="Add your first" onCta={openNew} />
       ) : (
         <div className="flex flex-col gap-2 mb-5">
-          {items.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => openEdit(item)}
-              className={clsx(
-                'text-left px-4 py-3 rounded-sm border transition-all duration-200 bg-dark-700 cursor-pointer w-full',
-                selected === item.id ? 'border-gold/50 bg-gold/5' : 'border-gold/10 hover:border-gold/30'
-              )}
-            >
-              <p className="text-sm font-medium text-neutral-200">{item[fields[0].key]}</p>
-              {fields[1] && <p className="text-xs text-neutral-500 mt-0.5">{item[fields[1].key]}</p>}
-            </button>
-          ))}
+          {items.map((item) => {
+            const isActive = selected === item.id
+            return (
+              <button key={item.id} onClick={() => openEdit(item)}
+                className="text-left px-4 py-3 rounded-sm transition-all duration-200 cursor-pointer w-full"
+                style={{
+                  backgroundColor: isActive ? 'rgba(var(--accent-rgb,45,74,110),0.06)' : 'var(--color-surface)',
+                  border: `1px solid ${isActive ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--color-border)' }}
+              >
+                <p className="text-sm font-medium" style={{ color: 'var(--color-heading)' }}>
+                  {item[fields[0].key]}
+                </p>
+                {fields[1] && (
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                    {item[fields[1].key]}
+                  </p>
+                )}
+              </button>
+            )
+          })}
         </div>
       )}
 
       {selected && (
-        <div className="border border-gold/15 rounded-sm p-4 bg-dark-800">
-          <p className="text-xs tracking-widest uppercase text-gold mb-4">
+        <div className="rounded-sm p-4"
+          style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+          <p className="text-xs tracking-widest uppercase mb-4" style={{ color: 'var(--color-accent)' }}>
             {selected === 'new' ? 'New Item' : 'Edit Item'}
           </p>
           {fields.map(({ key, label, rows, placeholder }) => (
-            <FormField
-              key={key} id={key} label={label} rows={rows} placeholder={placeholder}
+            <FormField key={key} id={key} label={label} rows={rows} placeholder={placeholder}
               value={form[key] ?? ''}
-              onChange={(v) => setForm((p) => ({ ...p, [key]: v }))}
-            />
+              onChange={(v) => setForm((p) => ({ ...p, [key]: v }))} />
           ))}
           <div className="flex gap-2 mt-2 flex-wrap">
             <button className="btn-gold flex items-center gap-2" onClick={handleSave} disabled={saving}>

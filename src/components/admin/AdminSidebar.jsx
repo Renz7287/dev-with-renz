@@ -1,37 +1,45 @@
 import clsx from 'clsx'
 
-const NAV_ITEMS = [
-  { key: 'summary',       label: 'Summary' },
-  { key: 'va-projects',   label: 'VA Projects' },
-  { key: 'tech-projects', label: 'Tech Projects' },
-  { key: 'va-skills',     label: 'VA Skills' },
-  { key: 'tech-skills',   label: 'Tech Skills' },
-  { key: 'tools',         label: 'Tools' },
-  { key: 'strengths',     label: 'Strengths' },
-  { key: 'availability',  label: 'Availability' },
-  { key: 'contacts',      label: 'Contacts' },
+const SECTIONS = [
+  { id: 'profile',       label: 'Profile Photo' },
+  { id: 'summary',       label: 'Summary' },
+  { id: 'va-projects',   label: 'VA Projects' },
+  { id: 'tech-projects', label: 'Tech Projects' },
+  { id: 'va-skills',     label: 'VA Skills' },
+  { id: 'tech-skills',   label: 'Tech Skills' },
+  { id: 'tools',         label: 'Tools' },
+  { id: 'strengths',     label: 'Strengths' },
+  { id: 'availability',  label: 'Availability' },
+  { id: 'contacts',      label: 'Contacts' },
 ]
 
 export default function AdminSidebar({ active, onChange, onLogout }) {
   return (
-    <aside className="w-44 shrink-0 border-r border-gold/10 py-4 flex flex-col">
-      <div className="flex-1">
-        {NAV_ITEMS.map((item) => (
+    <aside className="w-44 flex-shrink-0 flex flex-col py-3"
+      style={{ borderRight: '1px solid var(--color-border)' }}>
+      <nav className="flex-1 flex flex-col">
+        {SECTIONS.map(({ id, label }) => (
           <button
-            key={item.key}
-            onClick={() => onChange(item.key)}
-            className={clsx('admin-nav-item', active === item.key && 'active')}
+            key={id}
+            onClick={() => onChange(id)}
+            className={clsx('admin-nav-item', { active: active === id })}
           >
-            {item.label}
+            {label}
           </button>
         ))}
+      </nav>
+      <div className="pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
+        <button
+          onClick={onLogout}
+          className="w-full text-left px-5 py-2.5 text-xs tracking-[0.06em] uppercase
+                     bg-transparent border-0 cursor-pointer transition-all duration-200 min-h-[44px]"
+          style={{ color: 'rgba(239,68,68,0.6)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.backgroundColor = 'transparent' }}
+        >
+          Sign Out
+        </button>
       </div>
-      <button
-        onClick={onLogout}
-        className="admin-nav-item mt-4 text-red-500/60 hover:text-red-400 hover:bg-red-500/5"
-      >
-        Logout
-      </button>
     </aside>
   )
 }
