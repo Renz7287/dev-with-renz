@@ -2,6 +2,7 @@ import clsx from 'clsx'
 
 const SECTIONS = [
   { id: 'profile',       label: 'Profile Photo' },
+  { id: 'resume',        label: 'Resume' },
   { id: 'summary',       label: 'Summary' },
   { id: 'va-projects',   label: 'VA Projects' },
   { id: 'tech-projects', label: 'Tech Projects' },

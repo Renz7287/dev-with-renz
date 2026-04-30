@@ -4,6 +4,7 @@ import { usePortfolio } from '../../context/PortfolioContext'
 import AdminLogin from './AdminLogin'
 import AdminSidebar from './AdminSidebar'
 import ProfilePhotoAdmin from './ProfilePhotoAdmin'
+import ResumeAdmin from './ResumeAdmin'
 import SummaryAdmin from './SummaryAdmin'
 import VaProjectsAdmin from './VaProjectsAdmin'
 import TechProjectsAdmin from './TechProjectsAdmin'
@@ -24,6 +25,7 @@ const SIMPLE_LIST_SECTIONS = new Set(['va-skills', 'tech-skills', 'tools', 'stre
 function AdminContent({ section }) {
   const { data, saveAvailability, removeAvailability, saveContact, removeContact } = usePortfolio()
   if (section === 'profile')       return <ProfilePhotoAdmin />
+  if (section === 'resume')        return <ResumeAdmin />
   if (section === 'summary')       return <SummaryAdmin />
   if (section === 'va-projects')   return <VaProjectsAdmin />
   if (section === 'tech-projects') return <TechProjectsAdmin />
@@ -49,7 +51,6 @@ export default function AdminPanel({ onClose }) {
       <div className="rounded-sm w-full max-w-3xl min-h-[580px] overflow-hidden"
         style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
 
-        {/* Header */}
         <div className="flex justify-between items-center px-6 py-4"
           style={{ borderBottom: '1px solid var(--color-border)' }}>
           <h2 className="font-head text-lg" style={{ color: 'var(--color-heading)' }}>
@@ -65,7 +66,6 @@ export default function AdminPanel({ onClose }) {
           >✕</button>
         </div>
 
-        {/* Body */}
         <div className="flex min-h-[520px]">
           {!isAuthenticated ? <AdminLogin /> : (
             <>

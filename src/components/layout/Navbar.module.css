@@ -196,3 +196,13 @@
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
 }
+
+/* ── Right side wrapper ──────────────────────── */
+/* On mobile: takes full width and pushes content to the right.
+   On desktop: auto width sits next to the desktopNav. */
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;  /* always pushes to the right regardless of siblings */
+}

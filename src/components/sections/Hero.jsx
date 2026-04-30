@@ -21,16 +21,24 @@ function ProfileAvatar({ src }) {
         boxShadow: '0 20px 40px rgba(0,0,0,0.10)',
       }}
     >
-      <span className="font-head text-5xl md:text-6xl select-none" style={{ color: 'var(--color-accent)', opacity: 0.4 }}>
-        C
-      </span>
+      <span className="font-head text-5xl md:text-6xl select-none"
+        style={{ color: 'var(--color-accent)', opacity: 0.4 }}>C</span>
     </div>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
   )
 }
 
 export default function Hero() {
   const { data } = usePortfolio()
-  const { summary, profilePhotoUrl } = data
+  const { summary, profilePhotoUrl, resumeUrl } = data
 
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center px-6 py-24">
@@ -53,7 +61,21 @@ export default function Hero() {
 
           <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-2">
             <a href="#projects" className="btn-gold">View My Work</a>
-            <a href="#contact"  className="btn-ghost">Contact Me</a>
+            <a href="#contact" className="btn-ghost">Contact Me</a>
+
+            {/* Download resume — only shown when a resume has been uploaded */}
+            {resumeUrl && (
+              <a
+                href={resumeUrl}
+                download="Clarence_Cabrera_Resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-ghost inline-flex items-center gap-2"
+              >
+                <DownloadIcon />
+                Resume
+              </a>
+            )}
           </div>
         </div>
 

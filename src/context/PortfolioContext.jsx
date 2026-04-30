@@ -7,12 +7,13 @@ import {
   getAvailability, upsertAvailability, deleteAvailability,
   getContacts, upsertContact, deleteContact,
   uploadProjectImage, deleteProjectImage,
+  uploadResume, deleteResume,
 } from '../lib/api'
 import { supabase } from '../lib/supabase'
 
 const PortfolioContext = createContext(null)
 
-// getSetting uses .single() which throws on missing row — use this safe version instead
+// Safe version of getSetting — uses maybeSingle() so missing rows return '' not an error
 async function getSettingSafe(key) {
   const { data, error } = await supabase
     .from('portfolio_settings')
@@ -27,6 +28,7 @@ export function PortfolioProvider({ children }) {
   const [data, setData] = useState({
     summary: '',
     profilePhotoUrl: '',
+    resumeUrl: '',
     vaProjects: [],
     techProjects: [],
     vaSkills: [],
@@ -49,13 +51,14 @@ export function PortfolioProvider({ children }) {
     setLoading(true)
     try {
       const [
-        summary, profilePhotoUrl,
+        summary, profilePhotoUrl, resumeUrl,
         vaProjects, techProjects,
         vaSkills, techSkills, tools, strengths,
         availability, contacts,
       ] = await Promise.all([
         getSettingSafe('summary'),
         getSettingSafe('profile_photo_url'),
+        getSettingSafe('resume_url'),
         getVaProjects(),
         getTechProjects(),
         getSimpleList('va_skills'),
@@ -68,6 +71,7 @@ export function PortfolioProvider({ children }) {
       setData({
         summary,
         profilePhotoUrl: profilePhotoUrl ?? '',
+        resumeUrl: resumeUrl ?? '',
         vaProjects, techProjects,
         vaSkills, techSkills, tools, strengths,
         availability, contacts,
@@ -91,22 +95,16 @@ export function PortfolioProvider({ children }) {
   // ── profile photo ──
   const updateProfilePhoto = useCallback(async (imageFile) => {
     if (!imageFile) return
-
     const ext = imageFile.name.split('.').pop()
     const fileName = `profile-photo.${ext}`
-
     const { error: uploadError } = await supabase.storage
       .from('profile-photos')
       .upload(fileName, imageFile, { upsert: true })
     if (uploadError) throw uploadError
-
     const { data: urlData } = supabase.storage
       .from('profile-photos')
       .getPublicUrl(fileName)
-
-    // Cache-bust so the browser refetches the new image
     const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
-
     await setSetting('profile_photo_url', publicUrl)
     setData((p) => ({ ...p, profilePhotoUrl: publicUrl }))
     showToast('Profile photo updated!')
@@ -117,6 +115,25 @@ export function PortfolioProvider({ children }) {
     await setSetting('profile_photo_url', '')
     setData((p) => ({ ...p, profilePhotoUrl: '' }))
     showToast('Profile photo removed!')
+  }, [showToast])
+
+  // ── resume ──
+  const updateResume = useCallback(async (file) => {
+    if (!file) return
+    const publicUrl = await uploadResume(file)
+    // Cache-bust so browsers don't serve a stale cached PDF
+    const urlWithBust = `${publicUrl}?t=${Date.now()}`
+    await setSetting('resume_url', urlWithBust)
+    setData((p) => ({ ...p, resumeUrl: urlWithBust }))
+    showToast('Resume uploaded!')
+    return urlWithBust
+  }, [showToast])
+
+  const removeResume = useCallback(async () => {
+    await deleteResume()
+    await setSetting('resume_url', '')
+    setData((p) => ({ ...p, resumeUrl: '' }))
+    showToast('Resume removed!')
   }, [showToast])
 
   // ── VA projects ──
@@ -245,6 +262,7 @@ export function PortfolioProvider({ children }) {
         data, loading, toast, showToast,
         updateSummary,
         updateProfilePhoto, removeProfilePhoto,
+        updateResume, removeResume,
         saveVaProject, removeVaProject,
         saveTechProject, removeTechProject,
         addToList, updateInList, removeFromList,

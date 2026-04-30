@@ -8,7 +8,6 @@ import styles from './Navbar.module.css'
 
 const NAV_LINKS = ['about', 'projects', 'skills', 'contact']
 
-// Tracks which section is in the viewport via IntersectionObserver
 function useActiveSection() {
   const [active, setActive] = useState('')
   useEffect(() => {
@@ -67,10 +66,10 @@ export default function Navbar({ onAdminClick }) {
 
   return (
     <>
-      <nav className="navbar-glass fixed top-0 left-0 right-0 z-50
-                      flex justify-between items-center px-6 md:px-10 py-4">
+      <nav className="navbar-glass fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-4"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
 
-        {/* Desktop nav links */}
+        {/* Desktop nav links — hidden on mobile via CSS Module */}
         <div className={styles.desktopNav}>
           {NAV_LINKS.map((id) => (
             <button
@@ -83,14 +82,14 @@ export default function Navbar({ onAdminClick }) {
           ))}
         </div>
 
-        {/* Right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Right side — always flex-end, fills full width on mobile */}
+        <div className={styles.rightSide}>
           {/* Desktop: toggle + admin */}
           <div className={styles.desktopControls}>
             <DarkModeToggle />
             <AdminBtn onClick={onAdminClick} isAuthenticated={isAuthenticated} />
           </div>
-          {/* Mobile: hamburger — hidden at md via CSS Module media query */}
+          {/* Mobile: hamburger */}
           <button
             className={styles.hamburger}
             onClick={() => setDrawerOpen(true)}
