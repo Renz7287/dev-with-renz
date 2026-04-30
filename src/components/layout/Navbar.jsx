@@ -2,118 +2,79 @@
 import { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import { useAuth } from '../../context/AuthContext'
-import DarkModeToggle from '../ui/DarkModeToggle'
-import AdminBtn from '../ui/AdminBtn'
-import styles from './Navbar.module.css'
+import { useDarkMode } from '../../hooks/useDarkMode'
 
 const NAV_LINKS = ['about', 'projects', 'skills', 'contact']
 
-// Tracks which section is in the viewport via IntersectionObserver
-function useActiveSection() {
-  const [active, setActive] = useState('')
-  useEffect(() => {
-    const observers = NAV_LINKS.map((id) => {
-      const el = document.getElementById(id)
-      if (!el) return null
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActive(id) },
-        { rootMargin: '-40% 0px -55% 0px' }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((o) => o?.disconnect())
-  }, [])
-  return active
+function SunIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.71.71M6.34 17.66l-.71.71M17.66 17.66l-.71-.71M6.34 6.34l-.71-.71M12 8a4 4 0 100 8 4 4 0 000-8z" />
+    </svg>
+  )
 }
 
-function MobileDrawer({ onClose, onAdminClick, isAuthenticated, activeSection }) {
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-    onClose()
-  }
+function MoonIcon() {
   return (
-    <>
-      <div className={styles.overlay} onClick={onClose} />
-      <div className={styles.drawer}>
-        <div className={styles.drawerHeader}>
-          <button className={styles.drawerClose} onClick={onClose} aria-label="Close menu">✕</button>
-        </div>
-        <nav className={styles.drawerNav}>
-          {NAV_LINKS.map((id) => (
-            <button
-              key={id}
-              onClick={() => scrollTo(id)}
-              className={clsx(styles.drawerLink, { [styles.drawerLinkActive]: activeSection === id })}
-            >
-              {id}
-            </button>
-          ))}
-        </nav>
-        <div className={styles.drawerFooter}>
-          <DarkModeToggle />
-          <AdminBtn onClick={() => { onClose(); onAdminClick() }} isAuthenticated={isAuthenticated} />
-        </div>
-      </div>
-    </>
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+    </svg>
+  )
+}
+
+function DarkModeToggle({ isDark, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm bg-transparent cursor-pointer transition-all duration-200"
+      style={{ border: '1px solid var(--color-border)', color: 'var(--color-muted)' }}
+      onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)'; e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+      onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-muted)';  e.currentTarget.style.borderColor = 'var(--color-border)' }}
+    >
+      {isDark ? <SunIcon /> : <MoonIcon />}
+    </button>
+  )
+}
+
+function NavLink({ id, onClick }) {
+  return (
+    <button
+      onClick={() => onClick(id)}
+      className="hidden md:block text-xs tracking-[0.1em] uppercase capitalize
+                 bg-transparent border-0 cursor-pointer min-h-[44px] px-1
+                 transition-colors duration-200"
+      style={{ color: 'var(--color-muted)' }}
+      onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-accent)' }}
+      onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-muted)' }}
+    >
+      {id}
+    </button>
   )
 }
 
 export default function Navbar({ onAdminClick }) {
   const { isAuthenticated } = useAuth()
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const activeSection = useActiveSection()
+  const { isDark, toggle } = useDarkMode()
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   return (
-    <>
-      <nav className="navbar-glass fixed top-0 left-0 right-0 z-50
-                      flex justify-between items-center px-6 md:px-10 py-4">
+    <nav className="navbar-glass fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-10 py-4">
+      <span className="font-head tracking-widest text-base select-none" style={{ color: 'var(--color-accent)' }}>
+        CGC
+      </span>
 
-        {/* Desktop nav links */}
-        <div className={styles.desktopNav}>
-          {NAV_LINKS.map((id) => (
-            <button
-              key={id}
-              onClick={() => scrollTo(id)}
-              className={clsx(styles.navLink, { [styles.navLinkActive]: activeSection === id })}
-            >
-              {id}
-            </button>
-          ))}
-        </div>
-
-        {/* Right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {/* Desktop: toggle + admin */}
-          <div className={styles.desktopControls}>
-            <DarkModeToggle />
-            <AdminBtn onClick={onAdminClick} isAuthenticated={isAuthenticated} />
-          </div>
-          {/* Mobile: hamburger — hidden at md via CSS Module media query */}
-          <button
-            className={styles.hamburger}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={drawerOpen}
-          >
-            <div className={styles.hamburgerLines}>
-              <span className={styles.line} />
-              <span className={styles.line} />
-              <span className={styles.line} />
-            </div>
-          </button>
-        </div>
-      </nav>
-
-      {drawerOpen && (
-        <MobileDrawer
-          onClose={() => setDrawerOpen(false)}
-          onAdminClick={onAdminClick}
-          isAuthenticated={isAuthenticated}
-          activeSection={activeSection}
-        />
-      )}
-    </>
+      <div className="flex items-center gap-4 md:gap-6">
+        {NAV_LINKS.map((id) => (
+          <NavLink key={id} id={id} onClick={scrollTo} />
+        ))}
+        <DarkModeToggle isDark={isDark} onToggle={toggle} />
+        <button onClick={onAdminClick} className="btn-ghost text-xs tracking-[0.1em] uppercase px-4 py-2">
+          {isAuthenticated ? '⚙ Admin' : 'Admin'}
+        </button>
+      </div>
+    </nav>
   )
 }

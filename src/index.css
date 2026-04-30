@@ -157,8 +157,8 @@ html:not(.dark) {
 
   /* ── Navbar ─────────────────────────────────────────────── */
   .navbar-glass {
-    background-color: var(--nav-bg);
-    border-bottom: 1px solid var(--nav-border);
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--navbar-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
